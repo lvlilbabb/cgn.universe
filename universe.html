@@ -1,0 +1,817 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CyberGenics – Cybersecurity in every DNA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --void:#04050A; --red:#E8261C; --plasma:#B0249A; --ion:#2C86E6; --frost:#E9EEF6;
+  --muted:color-mix(in srgb, var(--frost) 62%, var(--void));
+  --glass:color-mix(in srgb, var(--void) 58%, transparent);
+  --line:color-mix(in srgb, var(--frost) 16%, transparent);
+  color-scheme:dark;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top, 0px);
+  padding-bottom:env(safe-area-inset-bottom, 0px);
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --void:#04050A; --frost:#E9EEF6; } }
+:root[data-theme="dark"] { --void:#04050A; --frost:#E9EEF6; }
+*, *::before, *::after { box-sizing:inherit }
+html { scroll-padding-top:env(safe-area-inset-top, 0px) }
+html, body { height:100%; margin:0; background:var(--void); color:var(--frost); font-family:'Sora', 'Segoe UI', system-ui, sans-serif; overflow:hidden; -webkit-font-smoothing:antialiased }
+button { font:inherit; color:inherit; background:none; border:0; cursor:pointer }
+button:focus-visible { outline:2px solid var(--ion); outline-offset:3px; border-radius:6px }
+
+.aurora { position:fixed; inset:-20%; pointer-events:none; filter:blur(60px); opacity:.55 }
+.aurora i { position:absolute; border-radius:50%; display:block }
+.aurora i:nth-child(1) { width:55vw; height:40vw; left:-5vw; top:5vh; background:radial-gradient(closest-side, color-mix(in srgb, var(--plasma) 45%, transparent), transparent); animation:drift1 38s ease-in-out infinite alternate }
+.aurora i:nth-child(2) { width:60vw; height:45vw; right:-10vw; bottom:0; background:radial-gradient(closest-side, color-mix(in srgb, var(--ion) 40%, transparent), transparent); animation:drift2 44s ease-in-out infinite alternate }
+.aurora i:nth-child(3) { width:35vw; height:30vw; left:40vw; top:35vh; background:radial-gradient(closest-side, color-mix(in srgb, var(--red) 30%, transparent), transparent); animation:drift1 52s ease-in-out infinite alternate-reverse }
+@keyframes drift1 { to { transform:translate(8vw, 6vh) scale(1.15) } }
+@keyframes drift2 { to { transform:translate(-10vw, -8vh) scale(1.1) } }
+
+#gl { position:fixed; inset:0; width:100%; height:100%; display:block; touch-action:none }
+
+.top { position:fixed; left:0; right:0; top:0; z-index:5; display:flex; align-items:center; gap:28px; padding:calc(env(safe-area-inset-top, 0px) + 22px) clamp(20px, 5vw, 72px) 18px }
+.top img { width:120px; height:auto; display:block }
+.top .links { display:flex; gap:26px; margin-left:auto; font-size:15px; color:var(--muted) }
+.top .links a { color:var(--muted); text-decoration:none }
+.top .links a:hover { color:var(--frost) }
+.top .links button:hover, .top .links button[aria-current="true"] { color:var(--frost) }
+.tour { font-size:14px; padding:9px 16px; border:1px solid var(--line); border-radius:999px; color:var(--frost); white-space:nowrap }
+.tour[aria-pressed="true"] { border-color:var(--red); background:color-mix(in srgb, var(--red) 18%, transparent) }
+
+.view { position:fixed; inset:0; z-index:3; display:flex; align-items:center; padding:120px clamp(20px, 6vw, 96px) 60px; pointer-events:none; opacity:0; filter:blur(14px); transform:translateY(14px); transition:opacity .8s ease, filter .8s ease, transform .8s ease }
+.view.on { opacity:1; filter:none; transform:none }
+.view.on .panel { pointer-events:auto }
+.panel > * { transition:opacity .45s ease, transform .55s cubic-bezier(.2,.8,.2,1), filter .45s ease }
+.panel.swap > * { opacity:0; transform:translateY(14px); filter:blur(6px) }
+.panel > *:nth-child(2) { transition-delay:.03s } .panel > *:nth-child(3) { transition-delay:.06s } .panel > *:nth-child(4) { transition-delay:.09s }
+.panel > *:nth-child(5) { transition-delay:.12s } .panel > *:nth-child(6) { transition-delay:.15s } .panel > *:nth-child(7) { transition-delay:.18s }
+.tags li { animation:rise .6s cubic-bezier(.2,.8,.2,1) both; animation-delay:calc(var(--i, 0) * 40ms + .15s) }
+@keyframes rise { from { opacity:0; transform:translateY(10px) } }
+.panel { max-width:560px }
+
+h1 { font-weight:300; font-size:clamp(46px, 7.4vw, 112px); line-height:.96; letter-spacing:-.035em; margin:0 0 28px; max-width:9ch }
+h2 { font-weight:300; font-size:clamp(36px, 4.6vw, 68px); line-height:1; letter-spacing:-.03em; margin:0 0 18px }
+p { margin:0; line-height:1.6; color:var(--muted); font-size:17px; max-width:46ch }
+.lede { font-size:19px; margin-bottom:34px }
+.cta { display:inline-flex; align-items:center; gap:12px; padding:16px 26px; border-radius:999px; background:var(--frost); color:var(--void); font-weight:600; font-size:16px }
+.cta.ghost { background:none; color:var(--frost); border:1px solid var(--line) }
+.row { display:flex; gap:12px; flex-wrap:wrap; margin-top:30px }
+
+.count { font-size:14px; color:var(--muted); margin-bottom:14px }
+.desc { margin-bottom:26px }
+.steps { list-style:none; padding:0; margin:6px 0 34px; display:grid; grid-template-columns:repeat(4, 1fr); position:relative; counter-reset:s; max-width:560px }
+.steps::before { content:''; position:absolute; left:15px; right:15px; top:15px; height:2px; background:var(--line) }
+.steps::after { content:''; position:absolute; left:15px; top:15px; height:2px; width:calc((100% - 30px) * var(--p, 0)); background:linear-gradient(90deg, var(--red), var(--plasma)); transition:width .8s cubic-bezier(.2,.8,.2,1) }
+.steps li { counter-increment:s; position:relative; padding:44px 12px 0 0; font-size:14px; line-height:1.35; color:var(--muted); transition:color .5s ease }
+.steps li::before { content:counter(s); position:absolute; left:0; top:0; z-index:1; width:32px; height:32px; border-radius:50%; display:grid; place-items:center; font-size:13px; background:var(--void); border:2px solid color-mix(in srgb, var(--frost) 22%, transparent); color:var(--muted); transition:all .5s ease }
+.steps li.done { color:color-mix(in srgb, var(--frost) 80%, var(--void)) }
+.steps li.done::before { border-color:var(--red); color:var(--frost) }
+.steps li.now { color:var(--frost) }
+.steps li.now::before { border-color:var(--red); background:var(--red); color:var(--frost); box-shadow:0 0 0 6px color-mix(in srgb, var(--red) 20%, transparent), 0 0 26px color-mix(in srgb, var(--red) 65%, transparent) }
+.sol-title { font-size:14px; color:var(--muted); margin:0 0 6px }
+.tags { list-style:none; padding:0; margin:0; display:grid; grid-template-columns:1fr 1fr; gap:0 28px; max-width:560px }
+.tags li { position:relative; font-size:14.5px; line-height:1.35; padding:10px 0 10px 18px; border-top:1px solid var(--line); color:var(--frost) }
+.tags li::before { content:''; position:absolute; left:0; top:50%; width:6px; height:6px; margin-top:-3px; border-radius:50%; background:var(--ion); box-shadow:0 0 10px var(--ion) }
+
+.pager { position:fixed; z-index:4; left:55%; right:3%; bottom:calc(env(safe-area-inset-bottom, 0px) + 34px); display:flex; align-items:center; justify-content:center; gap:20px; opacity:0; pointer-events:none; transition:opacity .6s ease }
+.pager.on { opacity:1; pointer-events:auto }
+.pager .arr { width:50px; height:50px; border-radius:50%; border:1px solid var(--line); font-size:26px; line-height:1; display:grid; place-items:center; background:var(--glass); backdrop-filter:blur(6px); transition:border-color .3s ease, background .3s ease }
+.pager .arr:hover { border-color:var(--red); background:color-mix(in srgb, var(--red) 14%, transparent) }
+.dots { display:flex; gap:16px }
+.dots button { display:flex; flex-direction:column; align-items:center; gap:8px; font-size:12.5px; color:var(--muted); padding:4px 2px; transition:color .3s ease }
+.dots i { width:10px; height:10px; border-radius:50%; border:1.5px solid color-mix(in srgb, var(--frost) 45%, transparent); transition:all .45s ease }
+.dots button:hover { color:var(--frost) }
+.dots button[aria-current="true"] { color:var(--frost) }
+.dots button[aria-current="true"] i { background:var(--red); border-color:var(--red); box-shadow:0 0 14px var(--red); transform:scale(1.3) }
+
+.cur { position:fixed; left:0; top:0; z-index:20; pointer-events:none; opacity:0; transition:opacity .3s ease }
+body.cur-on .cur { opacity:1 }
+.cur-dot i { position:absolute; left:-4px; top:-4px; width:8px; height:8px; border-radius:50%; background:var(--frost); box-shadow:0 0 12px var(--frost), 0 0 28px color-mix(in srgb, var(--plasma) 75%, transparent); transition:transform .25s ease }
+.cur-ring i { position:absolute; left:-22px; top:-22px; width:44px; height:44px; border-radius:50%; border:1.5px solid color-mix(in srgb, var(--frost) 40%, transparent); background:radial-gradient(closest-side, color-mix(in srgb, var(--plasma) 20%, transparent), transparent); transition:transform .4s cubic-bezier(.2,.8,.2,1), border-color .3s ease, background .3s ease }
+body.cur-hover .cur-ring i { transform:scale(1.6); border-color:var(--red); background:radial-gradient(closest-side, color-mix(in srgb, var(--red) 24%, transparent), transparent) }
+body.cur-hover .cur-dot i { transform:scale(.5) }
+body.cur-down .cur-ring i { transform:scale(.8) }
+body.has-cursor, body.has-cursor * { cursor:none !important }
+
+.tabs { display:flex; gap:6px; margin:6px 0 22px; padding:5px; border:1px solid var(--line); border-radius:999px; width:max-content; max-width:100% }
+.tabs button { padding:10px 20px; border-radius:999px; font-size:15px; color:var(--muted) }
+.tabs button[aria-selected="true"] { color:var(--void); background:var(--frost) }
+.tabs button[data-k="0"][aria-selected="true"] { background:var(--red); color:var(--frost) }
+.tabs button[data-k="1"][aria-selected="true"] { background:var(--ion); color:var(--frost) }
+.svc { list-style:none; padding:0; margin:0; display:grid; gap:2px }
+.svc li { padding:13px 0; border-top:1px solid var(--line); animation:rise .6s cubic-bezier(.2,.8,.2,1) both; animation-delay:calc(var(--i, 0) * 60ms + .05s) }
+.mss-body { transition:opacity .28s ease, filter .28s ease, transform .4s cubic-bezier(.2,.8,.2,1) }
+.mss-body.swap { opacity:0; filter:blur(6px); transform:translateY(10px) }
+.tabs button { transition:background .4s ease, color .4s ease }
+.svc b { display:block; font-weight:400; color:var(--frost); font-size:16px; margin-bottom:2px }
+.svc span { color:var(--muted); font-size:14px; line-height:1.5 }
+
+.why { display:grid; grid-template-columns:1fr 1fr; gap:0 34px; margin-top:8px; max-width:640px }
+.why div { padding:16px 0; border-top:1px solid var(--line); font-size:17px; line-height:1.4 }
+.why-panel { max-width:680px }
+
+.labels { position:fixed; inset:0; z-index:4; pointer-events:none }
+.pl { position:absolute; left:0; top:0; pointer-events:auto; text-align:left; padding:8px 12px 8px 14px; border-left:2px solid var(--ion); background:var(--glass); backdrop-filter:blur(6px); border-radius:0 8px 8px 0; opacity:0; transition:opacity .5s ease, border-color .3s ease; white-space:nowrap }
+.pl b { display:block; font-weight:600; font-size:15px }
+.pl span { font-size:12.5px; color:var(--muted) }
+.pl:hover, .pl:focus-visible { border-color:var(--red) }
+.labels.on .pl { opacity:1 }
+.core-l { position:absolute; left:0; top:0; font-size:12.5px; color:var(--muted); opacity:0; transition:opacity .5s ease; white-space:nowrap }
+.labels.on .core-l { opacity:1 }
+
+.hint { position:fixed; left:50%; bottom:calc(env(safe-area-inset-bottom, 0px) + 22px); transform:translateX(-50%); z-index:4; font-size:13px; color:var(--muted); opacity:.8; pointer-events:none; transition:opacity .6s }
+.fallback { position:fixed; inset:0; display:none; align-items:center; justify-content:center; text-align:center; padding:40px; z-index:9 }
+
+@media (max-width: 820px) {
+  .top { gap:14px }
+  .top .links { display:none }
+  .top img { width:96px }
+  .tour { margin-left:auto }
+  .view { align-items:flex-end; padding:90px 22px calc(env(safe-area-inset-bottom, 0px) + 56px) }
+  .panel { max-height:56vh; overflow:auto }
+  h1 { font-size:46px; margin-bottom:18px }
+  .lede { font-size:16px; margin-bottom:22px }
+  .why { grid-template-columns:1fr }
+  .steps { grid-template-columns:1fr 1fr; row-gap:16px }
+  .steps::before, .steps::after { display:none }
+  .tags { grid-template-columns:1fr }
+  .cur { display:none }
+  .pager { left:0; right:0; bottom:auto; top:calc(env(safe-area-inset-top, 0px) + 74px) }
+  .dots span { display:none }
+  .pl b { font-size:13px } .pl span { display:none }
+}
+@media (prefers-reduced-motion: reduce) {
+  .aurora i { animation:none }
+  .view { transition:opacity .3s ease; filter:none; transform:none }
+  .panel > * { transition:opacity .2s ease }
+  .tags li { animation:none }
+}
+</style>
+</head>
+<body>
+<div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+<canvas id="gl" aria-hidden="true"></canvas>
+<div class="cur cur-ring" id="curRing" aria-hidden="true"><i></i></div>
+<div class="cur cur-dot" id="curDot" aria-hidden="true"><i></i></div>
+
+<header class="top">
+  <button data-go="home" aria-label="CyberGenics home"><img src="data:image/png;base64,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" alt="CyberGenics"></button>
+  <nav class="links" aria-label="Sections">
+    <button data-go="universe">Five domains</button>
+    <button data-go="managed">Managed services</button>
+    <button data-go="why">Why CyberGenics</button>
+    <a href="planets.html">Planet view</a>
+    <a href="solar.html">Solar system</a>
+    <a href="managed.html">Managed services</a>
+    <a href="index.html">All experiences</a>
+  </nav>
+  <button class="tour" id="tourBtn" aria-pressed="false">Start tour</button>
+</header>
+
+<div class="labels" id="labels" aria-label="Choose a domain"></div>
+
+<section class="view" id="v-home" aria-label="Home">
+  <div class="panel">
+    <h1>Cybersecurity in every DNA</h1>
+    <p class="lede">Five security domains, one managed defense. See how CyberGenics protects identities, devices, networks, applications and data.</p>
+    <button class="cta" data-go="universe">Explore the universe</button>
+  </div>
+</section>
+
+<section class="view" id="v-universe" aria-label="Five domains">
+  <div class="panel">
+    <h2>Five domains, one universe</h2>
+    <p>Every domain orbits one visibility core, so a threat seen in one place is stopped everywhere. Choose a planet to look inside.</p>
+    <div class="row"><button class="cta ghost" data-go="managed">How we manage it all</button></div>
+  </div>
+</section>
+
+<section class="view" id="v-domain" aria-label="Domain">
+  <div class="panel">
+    <div class="count" id="dCount"></div>
+    <h2 id="dTitle"></h2>
+    <p class="desc" id="dDesc"></p>
+    <ol class="steps" id="dSteps"></ol>
+    <p class="sol-title">Solutions</p>
+    <ul class="tags" id="dTags"></ul>
+    <div class="row">
+      <button class="cta ghost" data-go="universe">All domains</button>
+    </div>
+  </div>
+</section>
+<nav class="pager" id="pager" aria-label="Choose a world">
+  <button class="arr" id="pPrev" aria-label="Previous world">&#8249;</button>
+  <div class="dots" id="pDots"></div>
+  <button class="arr" id="pNext" aria-label="Next world">&#8250;</button>
+</nav>
+
+<section class="view" id="v-managed" aria-label="Managed Security Services">
+  <div class="panel">
+    <h2>Managed Security Services</h2>
+    <div class="tabs" role="tablist" id="mTabs"></div>
+    <div class="mss-body" id="mBody">
+      <p id="mLine" style="margin-bottom:16px"></p>
+      <ul class="svc" id="mList"></ul>
+    </div>
+  </div>
+</section>
+
+<section class="view" id="v-why" aria-label="Why CyberGenics">
+  <div class="panel why-panel">
+    <h2>Why CyberGenics</h2>
+    <div class="why" id="whyList"></div>
+    <p style="margin-top:28px">Talk to our team here at the booth to see it running in your environment.</p>
+    <div class="row"><button class="cta" data-go="universe">Explore the domains</button></div>
+  </div>
+</section>
+
+<div class="hint" id="hint">Drag to rotate · tap to explore</div>
+<div class="fallback" id="fallback"><p>This experience needs WebGL. Open it in Chrome or Edge with hardware acceleration turned on.</p></div>
+
+<script src="lib/three.min.js"></script>
+<script>
+(function () {
+  const DOMAINS = [
+    { id: 'identity', name: 'Identity', title: 'Identity Management', desc: 'Manages identities and access with strong authentication, least privilege and lifecycle governance to prevent unauthorized use.', steps: ['Request access', 'Verify with MFA', 'Grant least privilege', 'Watch for misuse'], tags: ['Customer Identity and Access Management', 'Identity Access Management', 'Identity Governance and Administration', 'Identity Threat Detection and Response', 'Multi-Factor Authentication', 'Privileged Access Management', 'Single Sign-on'] },
+    { id: 'devices', name: 'Devices', title: 'Endpoint Security', desc: 'Protects endpoints with prevention, detection and response to stop malware, ransomware and suspicious behavior.', steps: ['Check device posture', 'Prevent known threats', 'Detect suspicious behavior', 'Respond and patch'], tags: ['Endpoint Detection and Response', 'Endpoint Protection Platform', 'Mobile Security', 'Patch Management'] },
+    { id: 'network', name: 'Network', title: 'Network Security', desc: 'Protects networks and traffic using segmentation, secure access and threat prevention to reduce exposure and lateral movement.', steps: ['Segment the network', 'Inspect traffic', 'Block threats', 'Detect lateral movement'], tags: ['DDoS Protection', 'Firewall Policy Management', 'Network Detection and Response', 'Next Generation Firewall', 'Next Generation IPS', 'Secure E-Mail Gateway', 'Secure Web Gateway', 'SSL VPN', 'Web Application Firewall'] },
+    { id: 'application', name: 'Application', title: 'Application Security', desc: 'Identifies and reduces software vulnerabilities across the SDLC using testing, secure coding and runtime protection.', steps: ['Scan the code', 'Test the running app', 'Secure the APIs', 'Protect at runtime'], tags: ['API Security', 'DevSecOps', 'Dynamic Application Security Testing', 'Software Composition Analysis', 'Static Application Security Testing', 'Web Application and API Protection'] },
+    { id: 'data', name: 'Data', title: 'Data Security', desc: 'Protects sensitive data with classification, encryption, access controls and DLP to prevent leakage and misuse.', steps: ['Discover data', 'Classify it', 'Encrypt it', 'Stop leakage'], tags: ['Data Loss Prevention', 'Database Activity Monitoring', 'Database Firewall', 'Endpoint Encryption', 'Hardware Security Module', 'Public Key Infrastructure', 'Quantum-Safe Security'] }
+  ];
+  const MSS = [
+    { name: 'Protect', line: 'Secure systems, data and communications across every environment.', items: [['Managed Firewall', 'Keep threats out of your network with an AI-powered next-gen firewall, fully managed.'], ['Managed WAF', 'Block web attacks before they reach your application, always on and always updated.'], ['Managed Secure Email', 'Stop phishing, BEC and malware at the inbox, before your people ever see them.'], ['Managed SASE / SSE', 'Connect your workforce securely from anywhere: zero trust, every access, every device.'], ['Managed AI Security', 'Secure your AI workforce and homegrown AI with AI guardrails.']] },
+    { name: 'Defense', line: 'Detect, contain and respond to threats 24/7/365.', items: [['Managed SOC', 'Eyes on your environment around the clock: analysts who act, not just alert.'], ['Managed Detection and Response', 'Detect threats faster, contain them before they spread, and recover with confidence.'], ['Managed Extended Detection and Response', 'Detection and response across endpoints, network, cloud and identity.'], ['Emergency Incident Response', 'Rapid containment and recovery when an active breach occurs, with a Thai-based team and a PDPA-aware playbook.']] },
+    { name: 'Risk', line: 'Identify, test and reduce exposure, continuously and proactively.', items: [['Managed Exposure Management', 'Continuously discover, prioritize and eliminate exposure before attackers exploit it.'], ['Vulnerability Assessment and Penetration Testing', 'Find real exploitable weaknesses before attackers do, from automated scanning to manual red team.'], ['Security Awareness Training and Cyber Drill', 'Build a human firewall with phishing simulations, cyber drills and role-based programs.'], ['Security Governance and Policy Consult', 'Frameworks, policies and compliance roadmaps aligned with Zero Trust, ISO, PCI DSS and AI governance.']] }
+  ];
+  const WHY = ['One console. One partner. No silos.', 'Proven technology stack. Not a pilot project.', 'Emergency IR, ready before you need it.', 'Start Essential. Scale to Elite. Anytime.', 'Co-managed: your team stays in control.', 'Global certifications and compliance.'];
+  const ROUTES = ['home', 'universe'].concat(DOMAINS.map(d => d.id), ['managed', 'why']);
+
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const small = () => innerWidth < 820;
+  const R = (function (s) { return function () { s |= 0; s = s + 0x6D2B79F5 | 0; let t = Math.imul(s ^ s >>> 15, 1 | s); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; })(20261028);
+  const G = () => (R() + R() + R() + R() - 2) * 0.87;
+
+  if (!window.THREE) { document.getElementById('fallback').style.display = 'flex'; return; }
+  let renderer;
+  try { renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('gl'), antialias: false, alpha: true, powerPreference: 'high-performance' }); }
+  catch (e) { document.getElementById('fallback').style.display = 'flex'; return; }
+  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 1.6));
+  renderer.setSize(innerWidth, innerHeight);
+  renderer.setClearColor(0x000000, 0);
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(42, innerWidth / innerHeight, 0.1, 100);
+  camera.position.set(0, 0, 8.4);
+  const group = new THREE.Group();
+  scene.add(group);
+
+  const N = (innerWidth < 820 || (matchMedia('(pointer:coarse)').matches && innerWidth < 1100)) ? 9000 : 20000;
+
+  function blank() { return { pos: new Float32Array(N * 3), grp: new Float32Array(N) }; }
+  function halo(S, i, r0, r1) {
+    const u = R() * 2 - 1, a = R() * 6.2832, r = r0 + R() * (r1 - r0), s = Math.sqrt(1 - u * u);
+    S.pos[i * 3] = Math.cos(a) * s * r; S.pos[i * 3 + 1] = u * r * 0.8; S.pos[i * 3 + 2] = Math.sin(a) * s * r;
+  }
+  function sample2D(draw, scale, depth, frac) {
+    const c = document.createElement('canvas'); c.width = c.height = 256;
+    const g = c.getContext('2d'); g.fillStyle = g.strokeStyle = '#fff'; g.lineCap = 'round'; g.lineJoin = 'round';
+    draw(g);
+    const d = g.getImageData(0, 0, 256, 256).data, pts = [];
+    for (let y = 0; y < 256; y++) for (let x = 0; x < 256; x++) if (d[(y * 256 + x) * 4 + 3] > 120) pts.push(x, y);
+    const S = blank();
+    for (let i = 0; i < N; i++) {
+      if (R() < (frac || 0.86) && pts.length) {
+        const j = Math.floor(R() * pts.length / 2) * 2;
+        S.pos[i * 3] = (pts[j] + R() - 0.5 - 128) / 128 * scale;
+        S.pos[i * 3 + 1] = -(pts[j + 1] + R() - 0.5 - 128) / 128 * scale;
+        S.pos[i * 3 + 2] = (R() - 0.5) * depth * (0.3 + 0.7 * R());
+      } else halo(S, i, 2.7, 4.2);
+    }
+    return S;
+  }
+
+  function dna() {
+    const S = blank();
+    for (let i = 0; i < N; i++) {
+      const k = R(), p = S.pos;
+      if (k < 0.7) {
+        const s = R(), y = (s - 0.5) * 4.3, a = s * Math.PI * 4.6 + (i % 2) * Math.PI;
+        p[i * 3] = Math.cos(a) * 0.95 + G() * 0.06; p[i * 3 + 1] = y + G() * 0.05; p[i * 3 + 2] = Math.sin(a) * 0.95 + G() * 0.06;
+      } else if (k < 0.88) {
+        const j = Math.floor(R() * 30), s = (j + 0.5) / 30, y = (s - 0.5) * 4.3, a = s * Math.PI * 4.6, t = R();
+        p[i * 3] = Math.cos(a) * 0.95 * (1 - 2 * t) + G() * 0.025; p[i * 3 + 1] = y + G() * 0.02; p[i * 3 + 2] = Math.sin(a) * 0.95 * (1 - 2 * t) + G() * 0.025;
+      } else halo(S, i, 1.6, 3.4);
+    }
+    return S;
+  }
+  const PLANETS = DOMAINS.map((d, k) => { const a = k * 6.2832 / 5 + 0.35; return [Math.cos(a) * 2.75, k % 2 ? 0.25 : -0.2, Math.sin(a) * 2.75]; });
+  const ORB = [[1.25, 0.16, 0.3, 0.16], [1.8, 0.24, 2.1, 0.12], [2.35, 0.27, 3.9, 0.09], [2.9, 0.24, 5.2, 0.07], [3.5, 0.3, 1.2, 0.055]];
+  const orbAng = (k, tt) => ORB[k][2] + tt * ORB[k][3];
+  function solar() {
+    const S = blank(), p = S.pos;
+    const wsum = ORB.reduce((a, o) => a + o[1] * o[1], 0), rsum = ORB.reduce((a, o) => a + o[0], 0);
+    for (let i = 0; i < N; i++) {
+      const k = R();
+      if (k < 0.2) {
+        const r = R() < 0.75 ? Math.pow(R(), 0.5) * 0.55 : 0.55 + Math.abs(G()) * 0.25, u = R() * 2 - 1, a = R() * 6.2832, s = Math.sqrt(1 - u * u);
+        p[i * 3] = Math.cos(a) * s * r; p[i * 3 + 1] = u * r; p[i * 3 + 2] = Math.sin(a) * s * r; S.grp[i] = 6;
+      } else if (k < 0.46) {
+        let x = R() * rsum, q = 0;
+        while (q < 4 && x > ORB[q][0]) { x -= ORB[q][0]; q++; }
+        const a = R() * 6.2832, r = ORB[q][0] + G() * 0.012;
+        p[i * 3] = Math.cos(a) * r; p[i * 3 + 1] = G() * 0.008; p[i * 3 + 2] = Math.sin(a) * r;
+      } else if (k < 0.95) {
+        let x = R() * wsum, q = 0;
+        while (q < 4 && x > ORB[q][1] * ORB[q][1]) { x -= ORB[q][1] * ORB[q][1]; q++; }
+        const sz = ORB[q][1], u = R() * 2 - 1, a = R() * 6.2832, s = Math.sqrt(1 - u * u), r = sz * (R() < 0.7 ? 1 : Math.pow(R(), 0.4));
+        p[i * 3] = ORB[q][0] + Math.cos(a) * s * r; p[i * 3 + 1] = u * r; p[i * 3 + 2] = Math.sin(a) * s * r; S.grp[i] = q + 1;
+      } else if (k < 0.985) {
+        const a = R() * 6.2832, r = 0.42 + R() * 0.14, x = Math.cos(a) * r, z = Math.sin(a) * r;
+        p[i * 3] = ORB[4][0] + x; p[i * 3 + 1] = z * Math.sin(0.45); p[i * 3 + 2] = z * Math.cos(0.45); S.grp[i] = 5;
+      } else halo(S, i, 4.4, 6.5);
+    }
+    return S;
+  }
+  function galaxy() {
+    const S = blank(), p = S.pos;
+    for (let i = 0; i < N; i++) {
+      const k = R();
+      if (k < 0.5) {
+        const arm = Math.floor(R() * 3), r = 0.45 + Math.pow(R(), 0.75) * 3.7, a = arm * 2.094 + r * 1.15 + G() * 0.32;
+        p[i * 3] = Math.cos(a) * r; p[i * 3 + 1] = G() * 0.12 * (1.2 - r / 4.5); p[i * 3 + 2] = Math.sin(a) * r;
+      } else if (k < 0.64) {
+        const r = Math.abs(G()) * 0.42, u = R() * 2 - 1, a = R() * 6.2832, s = Math.sqrt(1 - u * u);
+        p[i * 3] = Math.cos(a) * s * r; p[i * 3 + 1] = u * r * 0.7; p[i * 3 + 2] = Math.sin(a) * s * r;
+      } else {
+        const q = Math.floor(R() * 5), c = PLANETS[q], u = R() * 2 - 1, a = R() * 6.2832, s = Math.sqrt(1 - u * u), r = R() < 0.75 ? 0.34 : 0.34 + R() * 0.3;
+        p[i * 3] = c[0] + Math.cos(a) * s * r; p[i * 3 + 1] = c[1] + u * r; p[i * 3 + 2] = c[2] + Math.sin(a) * s * r;
+        S.grp[i] = q + 1;
+      }
+    }
+    return S;
+  }
+  function fingerprint() {
+    return sample2D(g => {
+      g.lineWidth = 6.5;
+      for (let i = 0; i < 10; i++) {
+        const r = 16 + i * 10.5, a0 = Math.PI * (1.02 + 0.05 * (i % 3)), a1 = Math.PI * (2.0 + 0.9 * (i < 6 ? 1 : 0.55) - 0.06 * (i % 2));
+        g.beginPath(); g.ellipse(128, 132, r * 0.78, r, 0, a0, a1); g.stroke();
+      }
+      g.beginPath(); g.moveTo(128, 120); g.lineTo(128, 170); g.stroke();
+    }, 2.3, 0.5);
+  }
+  function devices() {
+    return sample2D(g => {
+      g.lineWidth = 8;
+      g.strokeRect(30, 62, 150, 98);
+      g.globalAlpha = 0.6; for (let y = 82; y < 150; y += 14) { g.fillRect(48, y, 40 + (y * 7) % 70, 5); } g.globalAlpha = 1;
+      g.beginPath(); g.moveTo(14, 176); g.lineTo(196, 176); g.lineTo(184, 190); g.lineTo(26, 190); g.closePath(); g.fill();
+      g.beginPath(); g.roundRect ? g.roundRect(200, 84, 46, 92, 9) : g.rect(200, 84, 46, 92); g.stroke();
+      g.beginPath(); g.arc(223, 164, 4, 0, 6.3); g.fill();
+    }, 2.35, 0.6);
+  }
+  function globe() {
+    const S = blank(), p = S.pos, RG = 1.75, nodes = [];
+    for (let k = 0; k < 11; k++) { const u = R() * 1.6 - 0.8, a = R() * 6.2832, s = Math.sqrt(1 - u * u); nodes.push([Math.cos(a) * s, u, Math.sin(a) * s]); }
+    for (let i = 0; i < N; i++) {
+      const k = R();
+      if (k < 0.55) {
+        let lat, lon;
+        if (R() < 0.5) { lat = (Math.floor(R() * 9) - 4) * 0.33; lon = R() * 6.2832; } else { lon = Math.floor(R() * 12) * 0.5236; lat = (R() - 0.5) * 3.1; }
+        p[i * 3] = Math.cos(lat) * Math.cos(lon) * RG; p[i * 3 + 1] = Math.sin(lat) * RG; p[i * 3 + 2] = Math.cos(lat) * Math.sin(lon) * RG;
+      } else if (k < 0.85) {
+        const a = nodes[Math.floor(R() * 11)], b = nodes[(Math.floor(R() * 10) + 1 + nodes.indexOf(a)) % 11], t = R();
+        const x = a[0] + (b[0] - a[0]) * t, y = a[1] + (b[1] - a[1]) * t, z = a[2] + (b[2] - a[2]) * t, l = Math.hypot(x, y, z) || 1, lift = RG * (1 + 0.28 * Math.sin(Math.PI * t));
+        p[i * 3] = x / l * lift; p[i * 3 + 1] = y / l * lift; p[i * 3 + 2] = z / l * lift;
+      } else if (k < 0.93) {
+        const n = nodes[Math.floor(R() * 11)], r = 0.09 * Math.abs(G());
+        p[i * 3] = n[0] * RG + G() * r; p[i * 3 + 1] = n[1] * RG + G() * r; p[i * 3 + 2] = n[2] * RG + G() * r;
+      } else halo(S, i, 2.6, 4.2);
+    }
+    return S;
+  }
+  function code() {
+    return sample2D(g => { g.font = '700 132px Sora, "Segoe UI", system-ui, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('</>', 128, 132); }, 2.5, 0.7);
+  }
+  function database() {
+    const S = blank(), p = S.pos, rr = 1.2, hh = 1.35, bands = [-hh, -hh / 3, hh / 3, hh];
+    for (let i = 0; i < N; i++) {
+      const k = R(), a = R() * 6.2832;
+      if (k < 0.5) { p[i * 3] = Math.cos(a) * rr; p[i * 3 + 1] = (R() * 2 - 1) * hh; p[i * 3 + 2] = Math.sin(a) * rr; }
+      else if (k < 0.78) { const b = bands[Math.floor(R() * 4)]; p[i * 3] = Math.cos(a) * rr * 1.02; p[i * 3 + 1] = b + G() * 0.02; p[i * 3 + 2] = Math.sin(a) * rr * 1.02; }
+      else if (k < 0.9) { const r = Math.sqrt(R()) * rr; p[i * 3] = Math.cos(a) * r; p[i * 3 + 1] = hh; p[i * 3 + 2] = Math.sin(a) * r; }
+      else halo(S, i, 2.6, 4.2);
+    }
+    return S;
+  }
+  function shield() {
+    const S = sample2D(g => {
+      g.beginPath(); g.moveTo(128, 34); g.lineTo(206, 66); g.lineTo(206, 128); g.quadraticCurveTo(204, 194, 128, 226); g.quadraticCurveTo(52, 194, 50, 128); g.lineTo(50, 66); g.closePath(); g.fill();
+      g.globalCompositeOperation = 'destination-out'; g.lineWidth = 3;
+      for (let y = 40; y < 232; y += 17) for (let x = 40; x < 220; x += 20) { const ox = (Math.floor(y / 17) % 2) * 10; g.beginPath(); for (let k = 0; k < 6; k++) { const a = k * 1.0472 + 0.5236; g.lineTo(x + ox + Math.cos(a) * 9, y + Math.sin(a) * 9); } g.closePath(); g.stroke(); }
+    }, 1.9, 0.35, 0.72);
+    const RINGS = [[2.35, 1.25, -0.25], [2.75, 1.1, 0.0], [3.15, 1.35, 0.3]];
+    for (let i = 0; i < N; i++) {
+      if (R() < 0.3) {
+        const k = Math.floor(R() * 3), rg = RINGS[k], a = R() * 6.2832, r = rg[0] + G() * 0.025;
+        let x = Math.cos(a) * r, y = 0, z = Math.sin(a) * r;
+        const cx = Math.cos(rg[1]), sx = Math.sin(rg[1]); const y2 = y * cx - z * sx, z2 = y * sx + z * cx;
+        const cz = Math.cos(rg[2]), sz = Math.sin(rg[2]); const x3 = x * cz - y2 * sz, y3 = x * sz + y2 * cz;
+        S.pos[i * 3] = x3; S.pos[i * 3 + 1] = y3; S.pos[i * 3 + 2] = z2; S.grp[i] = k + 1;
+      }
+    }
+    return S;
+  }
+  function pix(draw) {
+    const c = document.createElement('canvas'); c.width = c.height = 256;
+    const g = c.getContext('2d'); g.fillStyle = g.strokeStyle = '#fff'; g.lineCap = 'round'; g.lineJoin = 'round';
+    draw(g);
+    const d = g.getImageData(0, 0, 256, 256).data, pts = [];
+    for (let y = 0; y < 256; y++) for (let x = 0; x < 256; x++) if (d[(y * 256 + x) * 4 + 3] > 120) pts.push(x, y);
+    return pts;
+  }
+  const DRAW = [
+    g => { g.lineWidth = 7; for (let i = 0; i < 10; i++) { const r = 16 + i * 10.5, a0 = Math.PI * (1.02 + 0.05 * (i % 3)), a1 = Math.PI * (2.0 + 0.9 * (i < 6 ? 1 : 0.55) - 0.06 * (i % 2)); g.beginPath(); g.ellipse(128, 132, r * 0.78, r, 0, a0, a1); g.stroke(); } g.beginPath(); g.moveTo(128, 120); g.lineTo(128, 170); g.stroke(); },
+    g => { g.lineWidth = 9; g.strokeRect(34, 66, 144, 94); g.globalAlpha = 0.7; for (let y = 86; y < 150; y += 15) g.fillRect(52, y, 40 + (y * 7) % 66, 6); g.globalAlpha = 1; g.beginPath(); g.moveTo(18, 176); g.lineTo(194, 176); g.lineTo(182, 190); g.lineTo(30, 190); g.closePath(); g.fill(); g.strokeRect(202, 90, 40, 84); g.beginPath(); g.arc(222, 162, 4, 0, 6.3); g.fill(); },
+    g => { const n = [[128, 52], [62, 108], [194, 108], [86, 190], [170, 190], [128, 132]]; g.lineWidth = 6; [[0, 1], [0, 2], [1, 3], [2, 4], [3, 4], [5, 0], [5, 1], [5, 2], [5, 3], [5, 4]].forEach(e => { g.beginPath(); g.moveTo(n[e[0]][0], n[e[0]][1]); g.lineTo(n[e[1]][0], n[e[1]][1]); g.stroke(); }); n.forEach((q, i) => { g.beginPath(); g.arc(q[0], q[1], i === 5 ? 20 : 14, 0, 6.3); g.fill(); }); },
+    g => { g.font = '700 128px Sora, Segoe UI, system-ui, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('</>', 128, 132); },
+    g => { g.lineWidth = 8; [70, 118, 166].forEach(y => { g.beginPath(); g.ellipse(112, y, 62, 18, 0, 0, 6.3); g.stroke(); }); g.beginPath(); g.moveTo(50, 70); g.lineTo(50, 166); g.moveTo(174, 70); g.lineTo(174, 166); g.stroke(); g.fillRect(152, 150, 66, 52); g.beginPath(); g.lineWidth = 9; g.arc(185, 150, 20, Math.PI, 0); g.stroke(); }
+  ];
+  function planetOf(k) {
+    const S = blank(), p = S.pos, RP = 1.45, ip = pix(DRAW[k]), n2 = ip.length / 2;
+    for (let i = 0; i < N; i++) {
+      const r = R();
+      if (r < 0.4) {
+        const u = R() * 2 - 1, a = R() * 6.2832, s = Math.sqrt(1 - u * u), rr = RP * (0.985 + R() * 0.03);
+        p[i * 3] = Math.cos(a) * s * rr; p[i * 3 + 1] = u * rr; p[i * 3 + 2] = Math.sin(a) * s * rr; S.grp[i] = 7;
+      } else if (r < 0.8 && n2) {
+        const j = Math.floor(R() * n2) * 2, x = (ip[j] + R() - 0.5 - 128) / 128 * 1.08, y = -(ip[j + 1] + R() - 0.5 - 128) / 128 * 1.08;
+        const z = Math.sqrt(Math.max(0, RP * RP - x * x - y * y));
+        p[i * 3] = x; p[i * 3 + 1] = y; p[i * 3 + 2] = z + 0.04 + R() * 0.05; S.grp[i] = 9;
+      } else if (r < 0.92) {
+        const a = R() * 6.2832, rr = 2.05 + G() * 0.05, x = Math.cos(a) * rr, z = Math.sin(a) * rr;
+        const cx = Math.cos(1.25), sx = Math.sin(1.25), y2 = -z * sx, z2 = z * cx;
+        const cz = Math.cos(-0.35), sz = Math.sin(-0.35);
+        p[i * 3] = x * cz - y2 * sz; p[i * 3 + 1] = x * sz + y2 * cz; p[i * 3 + 2] = z2; S.grp[i] = 8;
+      } else halo(S, i, 2.6, 4.4);
+    }
+    return S;
+  }
+  const SHAPES = { home: dna(), universe: solar(), managed: shield() };
+  DOMAINS.forEach((d, k) => { SHAPES[d.id] = planetOf(k); });
+  SHAPES.why = SHAPES.home;
+
+  const geo = new THREE.BufferGeometry();
+  const aFrom = new Float32Array(SHAPES.home.pos), aTo = new Float32Array(SHAPES.home.pos), aRand = new Float32Array(N), aGrp = new Float32Array(N);
+  for (let i = 0; i < N; i++) aRand[i] = R();
+  geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(N * 3), 3));
+  geo.setAttribute('aFrom', new THREE.BufferAttribute(aFrom, 3));
+  geo.setAttribute('aTo', new THREE.BufferAttribute(aTo, 3));
+  geo.setAttribute('aRand', new THREE.BufferAttribute(aRand, 1));
+  geo.setAttribute('aGrp', new THREE.BufferAttribute(aGrp, 1));
+  geo.boundingSphere = new THREE.Sphere(new THREE.Vector3(), 12);
+  const css = getComputedStyle(document.documentElement);
+  const col = n => new THREE.Color((css.getPropertyValue(n) || '#ffffff').trim());
+  const U = {
+    uMix: { value: 1 }, uTime: { value: 0 }, uSize: { value: 30 * Math.min(devicePixelRatio || 1, 1.6) }, uActive: { value: -1 }, uRing: { value: 0 },
+    uMouse: { value: new THREE.Vector2(9, 9) }, uAspect: { value: innerWidth / innerHeight }, uHover: { value: 0 }, uSwirl: { value: reduce ? 0 : 1 }, uSolar: { value: 0 }, uPlanet: { value: 0 }, uPC: { value: new THREE.Color(1, 0, 0) }, uA1: { value: 0 }, uA2: { value: 0 }, uA3: { value: 0 }, uA4: { value: 0 }, uA5: { value: 0 },
+    cA: { value: col('--red') }, cB: { value: col('--plasma') }, cC: { value: col('--ion') }, cD: { value: col('--frost') }
+  };
+  const mat = new THREE.ShaderMaterial({
+    uniforms: U, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+    vertexShader: `
+      attribute vec3 aFrom; attribute vec3 aTo; attribute float aRand; attribute float aGrp;
+      uniform float uMix, uTime, uSize, uActive, uRing, uAspect, uHover, uSwirl, uSolar, uA1, uA2, uA3, uA4, uA5; uniform vec2 uMouse;
+      uniform vec3 cA, cB, cC, cD, uPC; uniform float uPlanet;
+      varying vec3 vCol; varying float vA;
+      float ease(float x) { return x < 0.5 ? 4.0 * x * x * x : 1.0 - pow(-2.0 * x + 2.0, 3.0) / 2.0; }
+      void main() {
+        float m = ease(clamp(uMix * 1.18 - aRand * 0.18, 0.0, 1.0));
+        vec3 p = mix(aFrom, aTo, m);
+        if (uSolar > 0.0 && aGrp > 0.5 && aGrp < 5.5) {
+          float an = (aGrp < 1.5 ? uA1 : (aGrp < 2.5 ? uA2 : (aGrp < 3.5 ? uA3 : (aGrp < 4.5 ? uA4 : uA5)))) * uSolar;
+          float ca = cos(an), sa = sin(an);
+          p.xz = vec2(p.x * ca - p.z * sa, p.x * sa + p.z * ca);
+        }
+        float sw = sin(m * 3.14159) * uSwirl;
+        p += sw * 0.55 * vec3(sin(aRand * 40.0 + uTime), cos(aRand * 31.0 + uTime * 0.7), sin(aRand * 17.0));
+        p += 0.022 * vec3(sin(uTime * 1.1 + aRand * 50.0), cos(uTime * 0.9 + aRand * 37.0), sin(uTime * 1.3 + aRand * 23.0));
+        vec4 mv = modelViewMatrix * vec4(p, 1.0);
+        vec4 cl = projectionMatrix * mv;
+        vec2 d = cl.xy / cl.w - uMouse; d.x *= uAspect;
+        float f = smoothstep(0.3, 0.0, length(d)) * uHover;
+        mv.xy += normalize(d + vec2(0.0001)) * f * 0.42;
+        gl_Position = projectionMatrix * mv;
+        float act = clamp(1.0 - abs(aGrp - uActive) * 1.6, 0.0, 1.0);
+        float h = clamp(p.y * 0.2 + 0.5 + (aRand - 0.5) * 0.25, 0.0, 1.0);
+        vec3 c = h < 0.5 ? mix(cA, cB, h * 2.0) : mix(cB, cC, (h - 0.5) * 2.0);
+        if (uRing > 0.5 && aGrp > 0.5) c = aGrp < 1.5 ? cA : (aGrp < 2.5 ? cC : cD);
+        if (uSolar > 0.5) {
+          if (aGrp > 0.5 && aGrp < 5.5) { float q = (aGrp - 1.0) / 4.0; c = q < 0.5 ? mix(cA, cB, q * 2.0) : mix(cB, cC, (q - 0.5) * 2.0); }
+          else if (aGrp > 5.5) c = mix(cA, cD, 0.2 + aRand * 0.4) * 1.25;
+          else c *= 0.5;
+        }
+        if (uPlanet > 0.5 && aGrp > 6.5) {
+          if (aGrp > 8.5) c = mix(cD, uPC, 0.35 + aRand * 0.25) * 1.25;
+          else if (aGrp > 7.5) c = mix(cC, cD, aRand * 0.5) * 1.15;
+          else { float sh = 0.6 + 0.75 * clamp(p.z / 1.45 * 0.5 + 0.5, 0.0, 1.0); c = mix(uPC, cB, aRand * 0.35) * sh; }
+        }
+        c = mix(c, cD, aRand * aRand * 0.22);
+        float dim = (uActive > -0.5 && act < 0.5 && aGrp > 0.5) ? 0.45 : 1.0;
+        vCol = c * (0.8 + act * 0.8) * dim;
+        vA = 0.45 + 0.55 * fract(aRand * 7.31);
+        gl_PointSize = uSize * (0.55 + aRand * 0.9) * (1.0 + act * 0.5) / -mv.z;
+      }`,
+    fragmentShader: `
+      varying vec3 vCol; varying float vA;
+      void main() { vec2 c = gl_PointCoord - 0.5; float d = length(c); float a = smoothstep(0.5, 0.0, d); a *= a; gl_FragColor = vec4(vCol * a * vA, a * vA); }`
+  });
+  const points = new THREE.Points(geo, mat);
+  const PC = [0, 0.25, 0.5, 0.75, 1].map(q => q < 0.5 ? U.cA.value.clone().lerp(U.cB.value, q * 2) : U.cB.value.clone().lerp(U.cC.value, (q - 0.5) * 2));
+  group.add(points);
+
+  const sGeo = new THREE.BufferGeometry(), sPos = new Float32Array(2400 * 3);
+  for (let i = 0; i < 2400; i++) { const u = R() * 2 - 1, a = R() * 6.2832, s = Math.sqrt(1 - u * u), r = 18 + R() * 30; sPos[i * 3] = Math.cos(a) * s * r; sPos[i * 3 + 1] = u * r; sPos[i * 3 + 2] = Math.sin(a) * s * r; }
+  sGeo.setAttribute('position', new THREE.BufferAttribute(sPos, 3));
+  const dotTex = (function () { const c = document.createElement('canvas'); c.width = c.height = 64; const g = c.getContext('2d'); const gr = g.createRadialGradient(32, 32, 0, 32, 32, 32); gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.fillRect(0, 0, 64, 64); return new THREE.CanvasTexture(c); })();
+  const stars = new THREE.Points(sGeo, new THREE.PointsMaterial({ size: 0.16, map: dotTex, transparent: true, opacity: 0.75, depthWrite: false, blending: THREE.AdditiveBlending, color: col('--frost') }));
+  scene.add(stars);
+
+  const TN = 56, tGeo = new THREE.BufferGeometry(), tPos = new Float32Array(TN * 3), tCol = new Float32Array(TN * 3), tDir = [];
+  for (let i = 0; i < TN; i++) { const u = R() * 1.4 - 0.7, a = R() * 6.2832, s = Math.sqrt(1 - u * u); tDir.push([Math.cos(a) * s, u, Math.sin(a) * s, R()]); }
+  tGeo.setAttribute('position', new THREE.BufferAttribute(tPos, 3));
+  tGeo.setAttribute('color', new THREE.BufferAttribute(tCol, 3));
+  const threats = new THREE.Points(tGeo, new THREE.PointsMaterial({ size: 0.2, map: dotTex, vertexColors: true, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending }));
+  group.add(threats);
+  const red = col('--red'), frost = col('--frost');
+
+  let curMix = 1;
+  function morph(name) {
+    const S = SHAPES[name];
+    const e = x => x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+    for (let i = 0; i < N; i++) {
+      const m = e(Math.min(1, Math.max(0, curMix * 1.18 - aRand[i] * 0.18)));
+      for (let c = 0; c < 3; c++) { const j = i * 3 + c; aFrom[j] = aFrom[j] + (aTo[j] - aFrom[j]) * m; }
+      const gq = aGrp[i];
+      if (U.uSolar.value > 0 && gq > 0.5 && gq < 5.5) {
+        const an = orbAng(Math.round(gq) - 1, t) * U.uSolar.value, ca = Math.cos(an), sa = Math.sin(an), x = aFrom[i * 3], z = aFrom[i * 3 + 2];
+        aFrom[i * 3] = x * ca - z * sa; aFrom[i * 3 + 2] = x * sa + z * ca;
+      }
+    }
+    aTo.set(S.pos); aGrp.set(S.grp);
+    geo.attributes.aFrom.needsUpdate = true; geo.attributes.aTo.needsUpdate = true; geo.attributes.aGrp.needsUpdate = true;
+    curMix = 0;
+  }
+
+  const els = id => document.getElementById(id);
+  const views = { home: els('v-home'), universe: els('v-universe'), domain: els('v-domain'), managed: els('v-managed'), why: els('v-why') };
+  const labels = els('labels');
+  const plBtns = DOMAINS.map((d, k) => { const b = document.createElement('button'); b.className = 'pl'; b.innerHTML = '<b></b><span></span>'; b.querySelector('b').textContent = d.name; b.querySelector('span').textContent = d.title; b.addEventListener('click', () => go(d.id)); labels.appendChild(b); return b; });
+  const coreL = document.createElement('div'); coreL.className = 'core-l'; coreL.textContent = 'Visibility and analytics core'; labels.appendChild(coreL);
+
+  let tab = 0;
+  const mTabs = els('mTabs');
+  MSS.forEach((m, k) => { const b = document.createElement('button'); b.setAttribute('role', 'tab'); b.dataset.k = k; b.textContent = m.name; b.addEventListener('click', () => setTab(k)); mTabs.appendChild(b); });
+  let activeT = 1, mT = null;
+  function fillTab(k) {
+    els('mLine').textContent = MSS[k].line;
+    const ul = els('mList'); ul.innerHTML = '';
+    MSS[k].items.forEach((it, i) => { const li = document.createElement('li'); li.style.setProperty('--i', i); const b = document.createElement('b'); b.textContent = it[0]; const s = document.createElement('span'); s.textContent = it[1]; li.append(b, s); ul.appendChild(li); });
+  }
+  function setTab(k) {
+    const changed = k !== tab;
+    tab = k;
+    Array.from(mTabs.children).forEach((b, i) => b.setAttribute('aria-selected', i === k ? 'true' : 'false'));
+    activeT = k + 1;
+    const body = els('mBody');
+    if (changed && state.view === 'managed' && !reduce) {
+      body.classList.add('swap');
+      clearTimeout(mT);
+      mT = setTimeout(() => { fillTab(k); requestAnimationFrame(() => body.classList.remove('swap')); }, 280);
+    } else { body.classList.remove('swap'); fillTab(k); }
+  }
+  const whyList = els('whyList');
+  WHY.forEach(w => { const d = document.createElement('div'); d.textContent = w; whyList.appendChild(d); });
+
+  let domIdx = 0, stepTimer = null;
+  function fillDomain(k) {
+    domIdx = k;
+    const d = DOMAINS[k];
+    els('dCount').textContent = 'Domain ' + (k + 1) + ' of 5';
+    els('dTitle').textContent = d.title;
+    els('dDesc').textContent = d.desc;
+    const ol = els('dSteps'); ol.innerHTML = '';
+    d.steps.forEach(s => { const li = document.createElement('li'); li.textContent = s; ol.appendChild(li); });
+    const ul = els('dTags'); ul.innerHTML = '';
+    d.tags.forEach((s, i) => { const li = document.createElement('li'); li.textContent = s; li.style.setProperty('--i', i); ul.appendChild(li); });
+    let n = 0;
+    clearInterval(stepTimer);
+    const tick = () => { const c = n % 4; Array.from(ol.children).forEach((li, i) => { li.classList.toggle('now', i === c); li.classList.toggle('done', i < c); }); ol.style.setProperty('--p', (c / 3).toFixed(3)); n++; };
+    tick();
+    stepTimer = setInterval(tick, 1700);
+  }
+  els('pPrev').addEventListener('click', () => go(DOMAINS[(domIdx + 4) % 5].id));
+  els('pNext').addEventListener('click', () => go(DOMAINS[(domIdx + 1) % 5].id));
+  const pDots = els('pDots');
+  const dotBtns = DOMAINS.map(d => { const b = document.createElement('button'); b.innerHTML = '<i></i><span></span>'; b.querySelector('span').textContent = d.name; b.setAttribute('aria-label', d.title); b.addEventListener('click', () => go(d.id)); pDots.appendChild(b); return b; });
+
+  const state = { view: 'home', route: 'home' };
+  let swapT = null, slide = null;
+  const planetPos = k => { const a = orbAng(k, t); return [Math.cos(a) * ORB[k][0], 0, Math.sin(a) * ORB[k][0]]; };
+  const LAYOUT = { home: [1.55, 0, 1, 0.12], universe: [1.35, -0.15, 0.98, 0.5], domain: [1.75, 0, 0.95, 0.08], managed: [1.75, 0, 0.82, 0.2], why: [2.6, 0, 0.85, 0.15] };
+  function go(route, fromTour) {
+    if (!ROUTES.includes(route)) route = 'home';
+    if (!fromTour) stopTour();
+    const dk = DOMAINS.findIndex(d => d.id === route);
+    const view = dk >= 0 ? 'domain' : route;
+    const prevView = state.view;
+    let sliding = false;
+    if (dk < 0) slide = null;
+    if (route !== state.route) {
+      if (prevView === 'domain' && dk >= 0 && !reduce) { const fwd = (dk - domIdx + 5) % 5; slide = { t0: t, dir: fwd <= 2 ? 1 : -1, k: dk, done: false }; sliding = true; }
+      else morph(route);
+    }
+    if (dk >= 0 && !sliding && !slide) U.uPC.value.copy(PC[dk]);
+    state.route = route; state.view = view;
+    Object.keys(views).forEach(k => views[k].classList.toggle('on', k === view));
+    labels.classList.toggle('on', view === 'universe');
+    if (dk >= 0) {
+      const panel = views.domain.querySelector('.panel');
+      if (prevView === 'domain' && dk !== domIdx && !reduce) {
+        panel.classList.add('swap');
+        clearTimeout(swapT);
+        swapT = setTimeout(() => { fillDomain(dk); requestAnimationFrame(() => panel.classList.remove('swap')); }, 340);
+      } else { panel.classList.remove('swap'); fillDomain(dk); }
+    } else clearInterval(stepTimer);
+    U.uSolar.value = view === 'universe' ? 1 : 0;
+    U.uPlanet.value = view === 'domain' ? 1 : 0;
+    els('pager').classList.toggle('on', view === 'domain');
+    dotBtns.forEach((b, i) => b.setAttribute('aria-current', i === dk ? 'true' : 'false'));
+    U.uRing.value = view === 'managed' ? 1 : 0;
+    U.uActive.value = view === 'managed' ? tab + 1 : -1;
+    activeT = tab + 1;
+    document.querySelectorAll('.links button').forEach(b => b.setAttribute('aria-current', (b.dataset.go === route || (b.dataset.go === 'universe' && view === 'domain')) ? 'true' : 'false'));
+    try { history.replaceState(null, '', '#' + route); } catch (e) {}
+  }
+  document.querySelectorAll('[data-go]').forEach(b => b.addEventListener('click', () => go(b.dataset.go)));
+  setTab(0);
+
+  let touring = false, tourI = 0, tourT = 0, idle = 0;
+  const TOUR = [['home', 7], ['universe', 7], ['identity', 8], ['devices', 8], ['network', 8], ['application', 8], ['data', 8], ['managed', 6, 0], ['managed', 6, 1], ['managed', 6, 2], ['why', 7]];
+  const tourBtn = els('tourBtn');
+  function startTour() { touring = true; tourI = 0; tourT = 0; tourBtn.setAttribute('aria-pressed', 'true'); tourBtn.textContent = 'Stop tour'; step(); }
+  function step() { const s = TOUR[tourI]; if (s[2] !== undefined) setTab(s[2]); go(s[0], true); }
+  function stopTour() { if (!touring) return; touring = false; tourBtn.setAttribute('aria-pressed', 'false'); tourBtn.textContent = 'Start tour'; }
+  tourBtn.addEventListener('click', e => { e.stopPropagation(); if (touring) stopTour(); else startTour(); idle = 0; });
+
+  const mouse = U.uMouse.value;
+  let dragging = false, lastX = 0, spin = 0, rotY = 0, hoverT = 0;
+  const canvas = renderer.domElement;
+  addEventListener('pointermove', e => {
+    mouse.set(e.clientX / innerWidth * 2 - 1, -(e.clientY / innerHeight * 2 - 1));
+    hoverT = 1; idle = 0;
+    if (dragging) { spin += (e.clientX - lastX) * 0.0045; lastX = e.clientX; }
+  });
+  canvas.addEventListener('pointerdown', e => {
+    dragging = true; lastX = e.clientX; idle = 0; stopTour();
+    if (state.view === 'universe') {
+      let best = -1, bd = 70;
+      ORB.forEach((o, k) => { const s = proj(planetPos(k)); const d = Math.hypot(s[0] - e.clientX, s[1] - e.clientY); if (d < bd) { bd = d; best = k; } });
+      if (best >= 0) go(DOMAINS[best].id);
+    }
+  });
+  let downX = 0, downY = 0;
+  canvas.addEventListener('pointerdown', e => { downX = e.clientX; downY = e.clientY; });
+  addEventListener('pointerup', e => {
+    dragging = false;
+    const dx = e.clientX - downX, dy = e.clientY - downY;
+    if (state.view === 'domain' && e.target === canvas && Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(dy) * 1.5) { spin = 0; go(DOMAINS[(domIdx + (dx < 0 ? 1 : 4)) % 5].id); }
+  });
+  addEventListener('keydown', e => {
+    idle = 0;
+    if (state.view === 'domain' && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')) { stopTour(); go(DOMAINS[(domIdx + (e.key === 'ArrowRight' ? 1 : 4)) % 5].id); }
+  });
+  addEventListener('wheel', () => { idle = 0; }, { passive: true });
+
+  const v3 = new THREE.Vector3();
+  function proj(p) { v3.set(p[0], p[1], p[2]).applyMatrix4(group.matrixWorld).project(camera); return [(v3.x + 1) / 2 * innerWidth, (1 - v3.y) / 2 * innerHeight, v3.z]; }
+
+  addEventListener('resize', () => {
+    renderer.setSize(innerWidth, innerHeight);
+    camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
+    U.uAspect.value = innerWidth / innerHeight;
+  });
+
+  const hint = els('hint');
+  const fine = matchMedia('(pointer: fine)').matches;
+  const curDot = els('curDot'), curRing = els('curRing');
+  let pcx = innerWidth / 2, pcy = innerHeight / 2, prx = pcx, pry = pcy;
+  if (fine) {
+    document.body.classList.add('has-cursor');
+    addEventListener('pointermove', e => {
+      pcx = e.clientX; pcy = e.clientY;
+      if (!document.body.classList.contains('cur-on')) { prx = pcx; pry = pcy; document.body.classList.add('cur-on'); }
+      const hit = e.target && e.target.closest ? e.target.closest('button, a, .pl') : null;
+      document.body.classList.toggle('cur-hover', !!hit);
+    });
+    document.addEventListener('mouseout', e => { if (!e.relatedTarget) document.body.classList.remove('cur-on'); });
+    addEventListener('pointerdown', () => document.body.classList.add('cur-down'));
+    addEventListener('pointerup', () => document.body.classList.remove('cur-down'));
+  }
+  let last = performance.now(), t = 0, slowAcc = 0, slowN = 0, reduced = false;
+  const target = { x: 1.55, y: 0, s: 1, rx: 0.12 };
+  let gx = 1.55;
+  function frame(now) {
+    const dt = Math.min(0.05, (now - last) / 1000); last = now; t += dt;
+    if (!reduced) { slowAcc += dt; slowN++; if (slowN === 120) { if (slowAcc / slowN > 0.034) { geo.setDrawRange(0, Math.floor(N * 0.55)); reduced = true; } slowAcc = 0; slowN = 0; } }
+    U.uTime.value = t;
+    U.uA1.value = orbAng(0, t); U.uA2.value = orbAng(1, t); U.uA3.value = orbAng(2, t); U.uA4.value = orbAng(3, t); U.uA5.value = orbAng(4, t);
+    if (state.view === 'managed') { const cu = U.uActive.value; U.uActive.value = cu < 0.5 ? activeT : cu + (activeT - cu) * Math.min(1, dt * 4); }
+    if (fine) {
+      const ck = Math.min(1, dt * 12);
+      prx += (pcx - prx) * ck; pry += (pcy - pry) * ck;
+      curDot.style.transform = 'translate(' + pcx + 'px,' + pcy + 'px)';
+      curRing.style.transform = 'translate(' + prx.toFixed(1) + 'px,' + pry.toFixed(1) + 'px)';
+    }
+    curMix = Math.min(1, curMix + dt / (reduce ? 0.6 : 1.7));
+    U.uMix.value = curMix;
+    hoverT = Math.max(0, hoverT - dt * 0.6);
+    U.uHover.value += ((dragging ? 0 : Math.min(1, hoverT * 2)) - U.uHover.value) * Math.min(1, dt * 4);
+    const L = LAYOUT[state.view];
+    const sm = small();
+    target.x = sm ? 0 : L[0]; target.y = sm ? 1.05 : L[1]; target.s = sm ? L[2] * 0.72 : L[2]; target.rx = L[3];
+    const k = Math.min(1, dt * 2.2);
+    gx += (target.x - gx) * k;
+    let off = 0;
+    if (slide) {
+      const sp = (t - slide.t0) / 0.9;
+      if (sp >= 1) slide = null;
+      else if (sp < 0.5) { const q = sp * 2; off = -slide.dir * 9 * q * q * q; }
+      else {
+        if (!slide.done) {
+          const S = SHAPES[DOMAINS[slide.k].id];
+          aFrom.set(S.pos); aTo.set(S.pos); aGrp.set(S.grp);
+          geo.attributes.aFrom.needsUpdate = true; geo.attributes.aTo.needsUpdate = true; geo.attributes.aGrp.needsUpdate = true;
+          curMix = 1; U.uPC.value.copy(PC[slide.k]); slide.done = true;
+        }
+        const q = 1 - (sp - 0.5) * 2; off = slide.dir * 9 * q * q * q;
+      }
+    }
+    group.position.x = gx + off;
+    group.position.y += (target.y - group.position.y) * k;
+    const sc = group.scale.x + (target.s - group.scale.x) * k; group.scale.setScalar(sc);
+    group.rotation.x += (target.rx - group.rotation.x) * k;
+    const auto = reduce ? 0.02 : (state.view === 'universe' ? 0.012 : (state.view === 'domain' ? 0 : 0.14));
+    spin *= Math.pow(0.04, dt);
+    rotY += auto * dt + spin * dt * 6;
+    if (state.view === 'domain' && !dragging) { const tg = Math.round(rotY / 6.2832) * 6.2832; rotY += (tg - rotY) * Math.min(1, dt * 1.6); }
+    group.rotation.y = rotY;
+    stars.rotation.y = t * 0.006; stars.rotation.x = Math.sin(t * 0.03) * 0.05;
+    const tv = (state.view === 'domain' || state.view === 'managed') && curMix > 0.9 ? 1 : 0;
+    for (let i = 0; i < TN; i++) {
+      const d = tDir[i], ph = (t * 0.22 + d[3]) % 1;
+      let r, a;
+      if (ph < 0.7) { r = 6.5 - (6.5 - 2.3) * (ph / 0.7); a = ph / 0.7; } else { const q = (ph - 0.7) / 0.3; r = 2.3 + 1.6 * q; a = 1 - q; }
+      tPos[i * 3] = d[0] * r; tPos[i * 3 + 1] = d[1] * r; tPos[i * 3 + 2] = d[2] * r;
+      const c = ph < 0.7 ? red : red.clone().lerp(frost, (ph - 0.7) / 0.3);
+      const al = a * tv * 0.9;
+      tCol[i * 3] = c.r * al; tCol[i * 3 + 1] = c.g * al; tCol[i * 3 + 2] = c.b * al;
+    }
+    tGeo.attributes.position.needsUpdate = true; tGeo.attributes.color.needsUpdate = true;
+    group.updateMatrixWorld();
+    if (state.view === 'universe') {
+      const mxp = (mouse.x + 1) / 2 * innerWidth, myp = (1 - mouse.y) / 2 * innerHeight;
+      let hov = -1, hd = 60;
+      ORB.forEach((o, i) => {
+        const s = proj(planetPos(i));
+        plBtns[i].style.transform = 'translate(' + (s[0] + 18 + o[1] * 60).toFixed(1) + 'px,' + (s[1] - 24).toFixed(1) + 'px)';
+        plBtns[i].style.visibility = s[2] < 1 ? 'visible' : 'hidden';
+        const d = Math.hypot(s[0] - mxp, s[1] - myp);
+        if (d < hd) { hd = d; hov = i; }
+        if (plBtns[i].matches(':hover')) hov = i;
+      });
+      U.uActive.value = hov >= 0 ? hov + 1 : -1;
+      const c = proj([0, 0.95, 0]); coreL.style.transform = 'translate(' + (c[0] - 90).toFixed(1) + 'px,' + (c[1] - 30).toFixed(1) + 'px)';
+    }
+    if (touring) { tourT += dt; if (tourT > TOUR[tourI][1]) { tourT = 0; tourI = (tourI + 1) % TOUR.length; step(); } }
+    else { idle += dt; if (idle > 35) { idle = 0; startTour(); } }
+    hint.style.opacity = (state.view === 'home' || state.view === 'universe') ? 0.8 : 0;
+    renderer.render(scene, camera);
+    requestAnimationFrame(frame);
+  }
+  let start = 'home';
+  try { const h = (location.hash || '').slice(1); if (ROUTES.includes(h)) start = h; } catch (e) {}
+  if (start !== 'home') { aFrom.set(SHAPES[start].pos); aTo.set(SHAPES[start].pos); aGrp.set(SHAPES[start].grp); state.route = start; }
+  go(start);
+  addEventListener('hashchange', () => { const h = (location.hash || '').slice(1); if (ROUTES.includes(h) && h !== state.route) go(h); });
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
